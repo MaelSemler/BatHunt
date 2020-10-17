@@ -1,79 +1,52 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class BatMovement : MonoBehaviour
 {
 
     Rigidbody2D mRigidBody2D;
-    
+    [SerializeField]
+    Vector3 lastVelocity;
+    [SerializeField]
+
+    public Text duckKilledText;
+    public int duckKilled;
+
     void Awake()
     {
-        
-        // Must be done in Awake() because SetDirection() will be called early. Start() won't work.
         mRigidBody2D = GetComponent<Rigidbody2D>();
 
-        float yVelocity = Random.Range(3, 7);
+        float xPosition = Random.Range(-2.5f, 2.5f);
+        float yVelocity = Random.Range(1, 3);
         float xVelocity = Random.Range(-3, 3);
 
+        transform.position = new Vector3(xPosition, -0.5f, 0f);
+
         mRigidBody2D.velocity = new Vector2(xVelocity, yVelocity);
+        lastVelocity = mRigidBody2D.velocity;
     }
 
     // Update is called once per frame
     void Update()
     {
-
-        //Random variable
-
-        float xPos = Random.Range(-3, 3);
-        
-
-
-
-        //Move on X axis
-
-        if(this.transform.position.y < -1.88)
-        {
-           /* xPos = Random.Range(-3, 3);
-            this.transform.position = new Vector2(xPos, -2);*/
-
-            Vector2 currentVelocity = this.GetComponent<Rigidbody2D>().velocity;
-            mRigidBody2D.velocity = new Vector2(currentVelocity.x, -currentVelocity.y);
-
-        }
-
-        if(this.transform.position.x < -3.64)
-        {
-            Vector2 currentVelocity = this.GetComponent<Rigidbody2D>().velocity;
-
-            mRigidBody2D.velocity = new Vector2(-currentVelocity.x, currentVelocity.y);
-        }
-
-        if (this.transform.position.x > 3.64)
-        {
-            Vector2 currentVelocity = this.GetComponent<Rigidbody2D>().velocity;
-
-            mRigidBody2D.velocity = new Vector2(-currentVelocity.x, currentVelocity.y);
-        }
-
-        if (this.transform.position.y > 1.87 && this.transform.position.y < 2)
-        {
-            Vector2 currentVelocity = this.GetComponent<Rigidbody2D>().velocity;
-
-            mRigidBody2D.velocity = new Vector2(currentVelocity.x, -currentVelocity.y);
-        }
-
-
-
+        lastVelocity = mRigidBody2D.velocity;
     }
 
     private void OnMouseOver()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            print("Click!!");
+           // Destroy(gameObject);
         }
     }
 
-    
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        var speed = lastVelocity.magnitude;
+        var direction = Vector3.Reflect(lastVelocity.normalized, collision.contacts[0].normal);
+
+        mRigidBody2D.velocity = direction * Mathf.Max(speed, 0f);
+    }
+
+
 }
