@@ -33,6 +33,16 @@ public class Crosshair : MonoBehaviour
                     score += 3;
                     Destroy(hit.collider.gameObject);
                 }
+                else if(hit.collider.gameObject.name == "Witch")
+                {
+                    hit.collider.gameObject.GetComponent<WitchMovement>().hitPoints--;
+                    if(hit.collider.gameObject.GetComponent<WitchMovement>().hitPoints == 0)
+                    {
+                        score += 5;
+                        Destroy(hit.collider.gameObject);
+                        GameObject.Find("GameManager").GetComponent<Game>().witchSent = false;
+                    }
+                }
                 else
                 {
                     score -= 1;

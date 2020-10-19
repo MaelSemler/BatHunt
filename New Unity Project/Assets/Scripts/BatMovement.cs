@@ -3,26 +3,20 @@ using UnityEngine.UI;
 
 public class BatMovement : MonoBehaviour
 {
-
+    [SerializeField]
     Rigidbody2D mRigidBody2D;
     [SerializeField]
     Vector3 lastVelocity;
-    [SerializeField]
 
-    public Text duckKilledText;
-    public int duckKilled;
+
+    public float timeOnScreen;
 
     void Awake()
     {
         mRigidBody2D = GetComponent<Rigidbody2D>();
 
-        float xPosition = Random.Range(-2.5f, 2.5f);
-        float yVelocity = Random.Range(1, 3);
-        float xVelocity = Random.Range(-3, 3);
+        transform.position = new Vector3(-10f, -10f, 0f);
 
-        transform.position = new Vector3(xPosition, -0.5f, 0f);
-
-        mRigidBody2D.velocity = new Vector2(xVelocity, yVelocity);
         lastVelocity = mRigidBody2D.velocity;
     }
 
@@ -30,14 +24,6 @@ public class BatMovement : MonoBehaviour
     void Update()
     {
         lastVelocity = mRigidBody2D.velocity;
-    }
-
-    private void OnMouseOver()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-           // Destroy(gameObject);
-        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
