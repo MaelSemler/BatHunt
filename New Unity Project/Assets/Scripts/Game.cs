@@ -15,6 +15,8 @@ public class Game : MonoBehaviour
     private int numberOfWitchLeft;
     public bool witchSent;
 
+    public int batKilledThisRound;
+
     [SerializeField]
     public bool normalVersion = true;
 
@@ -108,12 +110,32 @@ public class Game : MonoBehaviour
         float xVelocity = Random.Range(-1 - difficulty, 1 + difficulty);
         float yVelocity = Random.Range(difficulty, 1 + difficulty);
 
-        bats[batNumber].transform.position = new Vector2(xPosition, -0.7f);
+        bats[batNumber].transform.position = new Vector2(xPosition, -1.2f);
         bats[batNumber].GetComponent<Rigidbody2D>().velocity = new Vector2(xVelocity, yVelocity);
         bats[batNumber].GetComponent<BatMovement>().timeOnScreen = Time.time;
        
         StartCoroutine(waitToSendNextBat(batNumber + 1));
        
+    }
+
+    IEnumerator waitToSendNextBat(int batNumber)
+    {
+
+
+        float waitTime = Random.Range(0.1f, 1.5f);
+        yield return new WaitForSeconds(waitTime);
+
+        float xPosition = Random.Range(-2.5f, 2.5f);
+        float xVelocity = Random.Range(-1 - difficulty, 1 + difficulty);
+        float yVelocity = Random.Range(difficulty, 1 + difficulty);
+        if (bats[batNumber])
+        {
+            bats[batNumber].transform.position = new Vector2(xPosition, -1.2f);
+            bats[batNumber].GetComponent<Rigidbody2D>().velocity = new Vector2(xVelocity, yVelocity);
+            bats[batNumber].GetComponent<BatMovement>().timeOnScreen = Time.time;
+        }
+
+
     }
 
     IEnumerator sendWitch()
@@ -131,37 +153,26 @@ public class Game : MonoBehaviour
         witch.GetComponent<Rigidbody2D>().velocity = new Vector2(0f, 0f);
         witch.name = "Witch";
 
-        witch.transform.position = new Vector2(xPosition, -0.5f);
+        witch.transform.position = new Vector2(xPosition, -1.2f);
         witch.GetComponent<Rigidbody2D>().velocity = new Vector2(xVelocity, yVelocity);
         witch.GetComponent<WitchMovement>().timeOnScreen = Time.time;
         
     }
 
-    IEnumerator waitToSendNextBat(int batNumber)
-    {
-       
-       
-        float waitTime = Random.Range(0.1f, 1.5f);
-        yield return new WaitForSeconds(waitTime);
-
-        float xPosition = Random.Range(-2.5f, 2.5f);
-        float xVelocity = Random.Range(-1 - difficulty, 1 + difficulty);
-        float yVelocity = Random.Range(difficulty, 1 + difficulty);
-        if (bats[batNumber])
-        {
-            bats[batNumber].transform.position = new Vector2(xPosition, -0.7f);
-            bats[batNumber].GetComponent<Rigidbody2D>().velocity = new Vector2(xVelocity, yVelocity);
-            bats[batNumber].GetComponent<BatMovement>().timeOnScreen = Time.time;
-        }
-        
-
-    }
+  
 
     void setNextLevel() {
+
+        if(batKilledThisRound < 6)
+        {
+            print("You did not killed enough bats this round. Game Over");
+        }
         difficulty += 0.25f;
         roundNumber++;
         roundNumberText.text = roundNumber.ToString();
         numberOfWitchLeft = 2;
+        batKilledThisRound = 0;
+
         generateNewBats();
         sendBats(0);
 

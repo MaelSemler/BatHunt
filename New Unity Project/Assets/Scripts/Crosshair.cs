@@ -24,22 +24,36 @@ public class Crosshair : MonoBehaviour
         {
             Vector2 mousePos2D = new Vector2(position.x, position.y);
 
-            RaycastHit2D hit = Physics2D.Raycast(mousePos2D, -Vector2.up);
+            RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos2D, -Vector2.up, 50f);
 
-            if (hit.collider != null)
+
+            if (hits[0].collider != null)
             {
-                if(hit.collider.gameObject.name == "Bat")
+                if(hits[0].collider.gameObject.name == "Bat")
                 {
-                    score += 3;
-                    Destroy(hit.collider.gameObject);
+                    if(hits[1].collider != null && hits[1].collider.gameObject.name == "Bat")
+                    {
+                        //2 kills for 3 points each and then extra 5
+                        score += 11;
+                        Destroy(hits[0].collider.gameObject);
+                        Destroy(hits[1].collider.gameObject);
+                        GameObject.Find("GameManager").GetComponent<Game>().batKilledThisRound += 2;
+                    }
+                    else
+                    {
+                        score += 3;
+                        Destroy(hits[0].collider.gameObject);
+                        GameObject.Find("GameManager").GetComponent<Game>().batKilledThisRound++;
+                    }
+
                 }
-                else if(hit.collider.gameObject.name == "Witch")
+                else if(hits[0].collider.gameObject.name == "Witch")
                 {
-                    hit.collider.gameObject.GetComponent<WitchMovement>().hitPoints--;
-                    if(hit.collider.gameObject.GetComponent<WitchMovement>().hitPoints == 0)
+                    hits[0].collider.gameObject.GetComponent<WitchMovement>().hitPoints--;
+                    if(hits[0].collider.gameObject.GetComponent<WitchMovement>().hitPoints == 0)
                     {
                         score += 5;
-                        Destroy(hit.collider.gameObject);
+                        Destroy(hits[0].collider.gameObject);
                         GameObject.Find("GameManager").GetComponent<Game>().witchSent = false;
                     }
                 }
