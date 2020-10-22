@@ -40,14 +40,6 @@ public class Crosshair : MonoBehaviour
         Vector2 mousePos = new Vector3(position.x, position.y);
 
         RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, -Vector2.up, 50f);
-       
-        /* Debug.DrawRay(mousePos, Vector3.forward, Color.green);
-
-        for (int i = 0; i < hits.Length; i++)
-        {
-            RaycastHit hit = hits[i];
-            print("hit " + hit);
-        }*/
 
         //This means it hit something
         if (hits[0].collider != null)

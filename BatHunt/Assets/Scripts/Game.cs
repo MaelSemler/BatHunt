@@ -198,7 +198,7 @@ public class Game : MonoBehaviour
         witch.transform.position = new Vector2(xPosition, -1.0f);
         witch.GetComponent<Rigidbody2D>().velocity = new Vector2(xVelocity, yVelocity);
         witch.GetComponent<WitchMovement>().timeOnScreen = Time.time;
-        //witch.GetComponent<AudioSource>().Play();
+        witch.GetComponent<AudioSource>().Play();
 
         //Check the direciton they are going, and flip the sprite if required
         if (xVelocity < 0)
@@ -212,9 +212,9 @@ public class Game : MonoBehaviour
     void setNextLevel() {
         difficulty += 0.25f;
 
-        if (minimumBatRequired < numberOfBatsPerLevel)
+        if ((difficulty * 4) % 4 == 0  && minimumBatRequired < numberOfBatsPerLevel)
         {
-            minimumBatRequired += (int)Mathf.Floor(difficulty);
+            minimumBatRequired++;
             minimumBatKilled.text = minimumBatRequired.ToString();
         }
 
@@ -258,6 +258,7 @@ public class Game : MonoBehaviour
     {
         normalVersion = normalVersion ? false : true;
         print("Special Mode Activated");
+        GetComponent<AudioSource>().Play();
         yield return new WaitForSecondsRealtime(5.0f);
         normalVersion = normalVersion ? false : true;
         print("Special Mode Finished");
