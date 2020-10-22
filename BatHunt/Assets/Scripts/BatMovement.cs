@@ -10,15 +10,12 @@ public class BatMovement : MonoBehaviour
     [SerializeField]
     SpriteRenderer mSpriteRenderer;
 
-
     public float timeOnScreen;
 
     void Awake()
     {
         mRigidBody2D = GetComponent<Rigidbody2D>();
         mSpriteRenderer = GetComponent<SpriteRenderer>();
-
-        timeOnScreen = Time.time + 1000.0f;
 
         transform.position = new Vector3(-10f, -10f, 0f);
 
@@ -31,10 +28,12 @@ public class BatMovement : MonoBehaviour
         lastVelocity = mRigidBody2D.velocity;
     }
 
+    //Collides with border, will change direction
     private void OnCollisionEnter2D(Collision2D collision)
     {
         var speed = lastVelocity.magnitude;
         var direction = Vector3.Reflect(lastVelocity.normalized, collision.contacts[0].normal);
+        //Flip the sprite if the bat changes direction
         if(lastVelocity.x > 0 && direction.x < 0)
         {
             flipSprite();
@@ -48,6 +47,7 @@ public class BatMovement : MonoBehaviour
         mRigidBody2D.velocity = direction * Mathf.Max(speed, 0f);
     }
 
+    //Simple sprite flip depending on the current value
     public void flipSprite()
     {
         if (mSpriteRenderer.flipX) {

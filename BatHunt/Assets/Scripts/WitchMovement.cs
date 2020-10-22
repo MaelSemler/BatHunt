@@ -32,10 +32,13 @@ public class WitchMovement : MonoBehaviour
         lastVelocity = mRigidBody2D.velocity;
     }
 
+    //Collides with border, will change direction
     private void OnCollisionEnter2D(Collision2D collision)
     {
         var speed = lastVelocity.magnitude;
         var direction = Vector3.Reflect(lastVelocity.normalized, collision.contacts[0].normal);
+
+        //Flip the sprite if the bat changes direction
         if (lastVelocity.x > 0 && direction.x < 0)
         {
             flipSprite();
@@ -49,6 +52,7 @@ public class WitchMovement : MonoBehaviour
         mRigidBody2D.velocity = direction * Mathf.Max(speed, 0f);
     }
 
+    //Simple sprite flip depending on the current value
     public void flipSprite()
     {
         if (mSpriteRenderer.flipX)

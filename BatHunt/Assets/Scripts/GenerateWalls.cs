@@ -15,6 +15,7 @@ public class GenerateWalls : MonoBehaviour
     }
 
 
+    //Generate invisible walls at the edge of the screen so that bats can bounce on them, except bottom has a gameobject is already there
     void GenerateCollidersAcrossScreen()
     {
         Vector2 lDCorner = Camera.main.ViewportToWorldPoint(new Vector3(0, 0f, Camera.main.nearClipPlane));
@@ -26,12 +27,6 @@ public class GenerateWalls : MonoBehaviour
         colliderpoints[0] = new Vector2(lDCorner.x, rUCorner.y);
         colliderpoints[1] = new Vector2(rUCorner.x, rUCorner.y);
         upperEdge.points = colliderpoints;
-
-        EdgeCollider2D lowerEdge = new GameObject("lowerEdge").AddComponent<EdgeCollider2D>();
-        colliderpoints = lowerEdge.points;
-        colliderpoints[0] = new Vector2(lDCorner.x, lDCorner.y);
-        colliderpoints[1] = new Vector2(rUCorner.x, lDCorner.y);
-        lowerEdge.points = colliderpoints;
 
         EdgeCollider2D leftEdge = new GameObject("leftEdge").AddComponent<EdgeCollider2D>();
         colliderpoints = leftEdge.points;
