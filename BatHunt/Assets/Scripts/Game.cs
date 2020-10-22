@@ -56,7 +56,7 @@ public class Game : MonoBehaviour
         batKilledThisRound = 0;
         resetText.text = "";
         originalObject = GameObject.Find("OGBat");
-        bats = new GameObject[numberOfBatsPerWave];
+        bats = new GameObject[(numberOfBatsPerWave*2)+1];
         batCount = 0;
         numberOfBatAlive = 0;
     }
@@ -68,7 +68,7 @@ public class Game : MonoBehaviour
         batKilledRoundText.text = batKilledThisRound.ToString();
 
         //Check if the number of bats have been killed
-        if (batCount >= numberOfBatsPerLevel)
+        if (batCount >= numberOfBatsPerLevel && normalVersion)
         {
             print("Set New level");
             batCount = 0;
@@ -145,12 +145,22 @@ public class Game : MonoBehaviour
     //Start a Coroutine for each bat
     void sendBats()
     {
-        print("Generating:" + numberOfBatsPerWave);
-        for (int i = 0; i < numberOfBatsPerWave; i++)
+        if (normalVersion)
         {
-            numberOfBatAlive++;
-            StartCoroutine(waitToSendNextBat(i));
+            for (int i = 0; i < numberOfBatsPerWave; i++)
+            {
+                numberOfBatAlive++;
+                StartCoroutine(waitToSendNextBat(i));
+            }
         }
+        else
+        {
+            for (int i = 0; i < numberOfBatsPerWave*2; i++)
+            {
+                StartCoroutine(waitToSendNextBat(i));
+            }
+        }
+        
     }
 
     //Wait X amount of time to send a bat, with random position and velocity
@@ -176,6 +186,7 @@ public class Game : MonoBehaviour
             originalObject = GameObject.Find("OGBat");
             nameToGive = "Bat1";
         }
+
         if(bats[batNumber] != null)
         {
             
@@ -264,6 +275,7 @@ public class Game : MonoBehaviour
         {
             //Make sure that all the witches and bats are killed before the start of next round
             killWitches();
+            batCount = 0;
             Time.timeScale = 0;
             newLevelText.text = "New Level";
             yield return new WaitForSecondsRealtime(2.0f);
@@ -280,17 +292,22 @@ public class Game : MonoBehaviour
     {
         normalVersion = normalVersion ? false : true;
         print("Special Mode Activated");
+        numberOfBatAlive += numberOfBatsPerWave;
+        print(numberOfBatAlive);
+        sendBats();
         GetComponent<AudioSource>().Play();
         yield return new WaitForSecondsRealtime(5.0f);
         normalVersion = normalVersion ? false : true;
         print("Special Mode Finished");
+        killWitches();
+        numberOfBatAlive = 0;
+
     }
 
     //Kill all characters on screen
     void killWitches()
     {
         numberOfBatAlive = 0;
-        batCount = 0;
         if (witchSent)
         {
             GameObject currentWitch = GameObject.Find("Witch");
@@ -300,7 +317,7 @@ public class Game : MonoBehaviour
                 witchSent = false;
             }
         }
-        for (int i = 0; i < numberOfBatsPerWave; i++)
+        for (int i = 0; i < numberOfBatsPerWave * 2; i++)
         {
             if (bats[i])
             {
@@ -318,6 +335,7 @@ public class Game : MonoBehaviour
         resetText.text = "";
         numberOfSpecialModes = 2;
         specialLeftText.text = "2";
+        newLevelText.text = "";
         GameObject.Find("Crosshair").GetComponent<Crosshair>().score = 0;
         GameObject.Find("Crosshair").GetComponent<Crosshair>().scoreText.text = "0";
         setNextLevel();

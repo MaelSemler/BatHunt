@@ -632,4 +632,4 @@ ScriptsOnlyBuild:
   platform: 5
   scenePathNames:
   - Assets/Scenes/BatHunt.unity
-  playerPath: C:/Users/leams/Documents/Comp 376/BatHunt/BatHunt.exe
+  playerPath: C:/Users/leams/Documents/Comp 376/BatHunt Submission/BatHunt/BatHunt.exe
