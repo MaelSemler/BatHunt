@@ -1,4 +1,12 @@
-﻿using System.Collections;
+﻿/*
+ * Made By: Maël Semler
+ * 40061228
+ * Comp 376
+ * Concordia Fall 2020
+ *
+ */
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 

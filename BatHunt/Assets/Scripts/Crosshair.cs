@@ -1,4 +1,12 @@
-﻿using UnityEngine;
+﻿/*
+ * Made By: Maël Semler
+ * 40061228
+ * Comp 376
+ * Concordia Fall 2020
+ *
+ */
+
+using UnityEngine;
 using UnityEngine.UI;
 
 public class Crosshair : MonoBehaviour
