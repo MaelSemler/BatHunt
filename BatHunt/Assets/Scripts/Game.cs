@@ -1,0 +1,239 @@
+﻿using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class Game : MonoBehaviour
+{
+    public int batCount;
+    [SerializeField]
+    public Text batKilledRoundText;
+    [SerializeField]
+    public Text minimumBatKilled;
+    [SerializeField]
+    public Text newLevelText;
+    [SerializeField]
+    public Text specialLeftText;
+    GameObject originalObject;
+    public float difficulty = 0;
+    public int roundNumber = 1;
+    [SerializeField]
+    public Text roundNumberText;
+
+    [SerializeField]
+    private int numberOfSpecialModes;
+
+    [SerializeField]
+    private int numberOfBatsPerLevel;
+    [SerializeField]
+    private int numberOfBatsPerWave;
+    GameObject[] bats;
+    [SerializeField]
+    private int numberOfWitchLeft;
+    public bool witchSent = false;
+    public int numberOfBatAlive;
+
+    public int batKilledThisRound;
+    [SerializeField]
+    public int minimumBatRequired;
+
+    public bool normalVersion = true;
+
+    void Start()
+    {
+        batKilledThisRound = 0;
+        originalObject = GameObject.Find("OGBat");
+        bats = new GameObject[numberOfBatsPerWave + 1];
+        batCount = 0;
+        numberOfBatAlive = 0;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        batKilledRoundText.text = batKilledThisRound.ToString();
+
+        if (batCount >= numberOfBatsPerLevel)
+        {
+            print("Set NEw level");
+            batCount = 0;
+            StartCoroutine(pauseBetweenLevel());
+        }
+        else if (numberOfBatAlive == 0)
+        {
+            sendBats();            
+        }
+        else
+        {
+           checkBatTimeAlive();
+        }
+
+        if (numberOfWitchLeft > 0 && !witchSent)
+        {
+            StartCoroutine(sendWitch());
+            numberOfWitchLeft--;
+        }
+        //Check if spacebar has been pressed and check if special modes are left
+        if (Input.GetKeyDown("space") && normalVersion && numberOfSpecialModes != 0)
+        {
+
+            numberOfSpecialModes--;
+            specialLeftText.text = numberOfSpecialModes.ToString();
+            StartCoroutine(specialMode());
+        }
+    }
+
+    //Check If the bat has been alive for more than 5 seconds, if yes the bat will disapear.
+    void checkBatTimeAlive()
+    {
+        for (int i = 0; i < numberOfBatsPerWave; i++)
+        {
+            if (bats[i] && (Time.time - bats[i].GetComponent<BatMovement>().timeOnScreen) >= 5f)
+            {
+                batCount++;
+                numberOfBatAlive--;
+                Destroy(bats[i]);
+            }
+        }
+        
+        if (witchSent)
+        {
+            GameObject currentWitch = GameObject.Find("Witch");
+            if(currentWitch && Time.time - currentWitch.GetComponent<WitchMovement>().timeOnScreen > 2.5f)
+            {
+                Destroy(currentWitch);
+                witchSent = false;
+            }
+        }
+    }
+
+    void sendBats()
+    {
+        for (int i = 0; i < numberOfBatsPerWave; i++)
+        {
+            numberOfBatAlive++;
+            StartCoroutine(waitToSendNextBat(i));
+        }
+    }
+
+    IEnumerator waitToSendNextBat(int batNumber)
+    {
+        float waitTime = Random.Range(0.1f, 1.5f);
+        yield return new WaitForSeconds(waitTime);
+
+        float xPosition = Random.Range(-2.5f, 2.5f);
+        float xVelocity = Random.Range(-1 - difficulty, 1 + difficulty);
+        float yVelocity = Random.Range(difficulty, 1 + difficulty);
+
+        string nameToGive = "";
+        if(Random.Range(0,8) == 0)
+        {
+            originalObject = GameObject.Find("OGBat2");
+            nameToGive = "Bat2";
+        }
+        else
+        {
+            originalObject = GameObject.Find("OGBat");
+            nameToGive = "Bat1";
+        }
+
+        bats[batNumber] = Instantiate(originalObject, new Vector3(0, 0, 0), Quaternion.identity);
+        bats[batNumber].transform.parent = originalObject.transform.parent;
+        bats[batNumber].name = nameToGive;
+        bats[batNumber].transform.position = new Vector2(xPosition, -1.0f);
+        bats[batNumber].GetComponent<Rigidbody2D>().velocity = new Vector2(xVelocity, yVelocity);
+        bats[batNumber].GetComponent<BatMovement>().timeOnScreen = Time.time;
+        if (xVelocity < 0)
+        {
+            bats[batNumber].GetComponent<BatMovement>().flipSprite();
+        }
+
+
+    }
+
+    IEnumerator sendWitch()
+    {
+        float waitTime = Random.Range(0.5f, 3f);
+        witchSent = true;
+        yield return new WaitForSeconds(waitTime);
+
+        float xPosition = Random.Range(-2.5f, 2.5f);
+        float xVelocity = Random.Range(-1 - difficulty, 1 + difficulty);
+        float yVelocity = Random.Range(difficulty, 1 + difficulty);
+
+        GameObject ogWitch = GameObject.Find("WitchOG");
+        GameObject witch = Instantiate(ogWitch, new Vector3(0, 0, 0), Quaternion.identity);
+        witch.GetComponent<Rigidbody2D>().velocity = new Vector2(0f, 0f);
+        witch.name = "Witch";
+
+        witch.transform.position = new Vector2(xPosition, -1.0f);
+        witch.GetComponent<Rigidbody2D>().velocity = new Vector2(xVelocity, yVelocity);
+        witch.GetComponent<WitchMovement>().timeOnScreen = Time.time;
+        //witch.GetComponent<AudioSource>().Play();
+        if (xVelocity < 0)
+        {
+            witch.GetComponent<WitchMovement>().flipSprite();
+        }
+
+    }
+
+    void setNextLevel() {
+        difficulty += 0.25f;
+        if (minimumBatRequired < numberOfBatsPerLevel)
+        {
+            minimumBatRequired += (int)Mathf.Floor(difficulty);
+            minimumBatKilled.text = minimumBatRequired.ToString();
+        }
+
+        roundNumber++;
+        roundNumberText.text = roundNumber.ToString();
+        numberOfWitchLeft = 2;
+        batKilledThisRound = 0;
+
+    }
+
+    IEnumerator pauseBetweenLevel()
+    {
+        if (batKilledThisRound < minimumBatRequired)
+        {
+            print("You did not killed enough bats this round. Game Over");
+            Time.timeScale = 0;
+            newLevelText.text = "Game Over";
+            yield return new WaitForSecondsRealtime(1.0f);
+        }
+        else
+        {
+            killWitches();
+            Time.timeScale = 0;
+            newLevelText.text = "New Level";
+            yield return new WaitForSecondsRealtime(2.0f);
+            newLevelText.text = "";
+            Time.timeScale = 1;
+
+            setNextLevel();
+        }
+        
+    }
+    IEnumerator specialMode()
+    {
+        normalVersion = normalVersion ? false : true;
+        print("Special Mode Activated");
+        yield return new WaitForSecondsRealtime(5.0f);
+        normalVersion = normalVersion ? false : true;
+        print("Special Mode Finished");
+    }
+
+    void killWitches()
+    {
+        if (witchSent)
+        {
+            GameObject currentWitch = GameObject.Find("Witch");
+            if (currentWitch)
+            {
+                Destroy(currentWitch);
+                witchSent = false;
+            }
+        }
+    }
+
+
+    }
