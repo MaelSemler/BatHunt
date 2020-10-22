@@ -301,7 +301,7 @@ public class Game : MonoBehaviour
         print("Special Mode Finished");
         killWitches();
         numberOfBatAlive = 0;
-
+        shouldSend = true;
     }
 
     //Kill all characters on screen
