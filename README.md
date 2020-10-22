@@ -5,6 +5,8 @@ Controls:
 - Mouse to move crosshair
 - Left Click on Mouse to shoot
 - Spacebar to activate Special mode
+- Escape to Quit the Game
+- R to restart the Game
 
 Goal:
 - Kill as much bats as possible

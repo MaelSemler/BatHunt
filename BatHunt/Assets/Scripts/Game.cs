@@ -12,6 +12,8 @@ public class Game : MonoBehaviour
     [SerializeField]
     public Text newLevelText;
     [SerializeField]
+    public Text resetText;
+    [SerializeField]
     public Text specialLeftText;
     GameObject originalObject;
     public float difficulty = 0;
@@ -44,6 +46,7 @@ public class Game : MonoBehaviour
     {
         //Initiate many variables
         batKilledThisRound = 0;
+        resetText.text = "";
         originalObject = GameObject.Find("OGBat");
         bats = new GameObject[numberOfBatsPerWave];
         batCount = 0;
@@ -88,6 +91,16 @@ public class Game : MonoBehaviour
             numberOfSpecialModes--;
             specialLeftText.text = numberOfSpecialModes.ToString();
             StartCoroutine(specialMode());
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+
+        if (Input.GetKeyDown("r"))
+        {
+            resetGame();
         }
     }
 
@@ -236,6 +249,7 @@ public class Game : MonoBehaviour
             print("You did not killed enough bats this round. Game Over");
             Time.timeScale = 0;
             newLevelText.text = "Game Over";
+            resetText.text = "Press R to Reset";
             yield return new WaitForSecondsRealtime(1.0f);
         }
         else
@@ -286,6 +300,19 @@ public class Game : MonoBehaviour
                 Destroy(bats[i]);
             }
         }
+    }
+
+    void resetGame()
+    {
+        Time.timeScale = 1;
+        difficulty = 0.5f;
+        roundNumber = 0;
+        resetText.text = "";
+        numberOfSpecialModes = 2;
+        specialLeftText.text = "2";
+        GameObject.Find("Crosshair").GetComponent<Crosshair>().score = 0;
+        GameObject.Find("Crosshair").GetComponent<Crosshair>().scoreText.text = "0";
+        setNextLevel();
     }
 
 
